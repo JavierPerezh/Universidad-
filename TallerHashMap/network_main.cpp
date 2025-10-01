@@ -10,7 +10,7 @@ int main(){
     auto end = chrono::high_resolution_clock::now();
 
     cout << "Procesando archivo: " << filename << endl;
-    Network network(filename, 1000);
+    Network network(filename, 500);
     
     start = chrono::high_resolution_clock::now();
     
@@ -73,7 +73,7 @@ int main(){
     end = chrono::high_resolution_clock::now();
 
     cout << chrono::duration_cast<chrono::microseconds>(end - start).count() << " ps" << endl;
-    network.display();
+    network.display(true);
     cout << "Debe imprimir 1000 usuarios" << endl;
     cout << "===============================" << endl;
     
