@@ -73,7 +73,7 @@ int main(){
     end = chrono::high_resolution_clock::now();
 
     cout << chrono::duration_cast<chrono::microseconds>(end - start).count() << " ps" << endl;
-    network.display(true);
+    network.display();
     cout << "Debe imprimir 1000 usuarios" << endl;
     cout << "===============================" << endl;
     

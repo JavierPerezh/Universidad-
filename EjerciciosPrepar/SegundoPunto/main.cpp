@@ -1,4 +1,3 @@
-
 // Online C++ Compiler - Build, Compile and Run your C++ programs online in your favorite browser
 
 #include<iostream>
@@ -16,6 +15,9 @@ class Estudiante {
     Cómo definir el orden en que se va a ordenar el atributo ?
     Pista: puede usar nuevos atributos de la clase Estudiante para eso.
     */
+    bool porId; //True: Ordenar por id, False: Ordenar por notas
+    bool ascendiente; //True: Orden ascendiente, False: Orden descendiente
+    
 
 
 public:
@@ -44,21 +46,29 @@ public:
 
     void setOrdOrderAsc() {
         //Define el orden como ascendente
-        
+        ascendiente = true;
     }
 
     void setOrdOrderDesc() {
-        //Define el orden como ascendente
-        
+        //Define el orden como decendiente
+        ascendiente = false;
     }
 
     void setOrdAtrib(int i) {
         //Define el atributo i como el usado para el ordenamiento. Use -1 para ordenar por el id.
-        
+        if(i == -1) porId = true;
+        else porId = false;
     }
 
     float promedio() {
         //Calcular el promedio de notas del estudiante
+        float sum = 0;
+        for(int i = 0; i < numNotas; i++)
+        {
+            sum += notas[i];
+        }
+        float prom = sum / (float)numNotas;
+        return prom;
     }
 
     string to_string() {
@@ -76,6 +86,28 @@ public:
         el atributo y el orden deseados
         */
 
+        if(porId)
+        {
+            if(id > e.getID())
+            {
+                return 1;
+            }
+            else if(id < e.getID())
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            if(promedio() > e.promedio())
+            {
+                return 1;
+            }
+            else if(promedio() < e.promedio())
+            {
+                return -1;
+            }
+        }
         return 0; //Retorna 0 si son iguales
     }
 
@@ -147,14 +179,16 @@ public:
         return false;
     }
 
-    Estudiante& operator=(Estudiante other) {
+    Estudiante& operator=(Estudiante &other) {
         //Implemente la asignación directa entre estudiantes. Siga el ejemplo de los programas hechos en clase.
         
-        
+        numNotas = other.numNotas;
+        id = other.numNotas;
+
         //Mantenga esta parte
-        this->notas.clear();
+        this -> notas.clear();
         for (int i = 0; i < other.numNotas; i++) {
-            this->notas.add(other.notas[i]);
+            this -> notas.add(other.notas[i]);
         }
         
         return *this;
@@ -164,8 +198,6 @@ public:
         return os << b.to_string();
     }
 
-    
-
 };
 
 class Curso {
@@ -173,6 +205,9 @@ class Curso {
     Vector<Estudiante> estudiantes;
     int numNotas;
     int numEstudiantes;
+    bool ascendiente;
+    bool criterio; //True: CantEstudiantes, false: Promedio
+
 public:
 
     Curso() {
@@ -190,17 +225,19 @@ public:
     void setOrdOrderAsc() {
         //Define el orden como ascendente en todos los estudiantes del Curso
         
-
+        ascendiente = true;
     }
 
     void setOrdOrderDesc() {
         //Define el orden como ascendente en todos los estudiantes del Curso
         
+        ascendiente = false;
     }
 
     void setOrdAtrib(int j) {
-        //Define el atributo i como el usado para el ordenamiento en todos los estudiantes del Curso. Use -1 para ordenar por el id.
         
+        if(j == -1) criterio = true;
+        else criterio = false;
     }
 
     void addEstudiante(Estudiante& e) {
@@ -213,8 +250,15 @@ public:
 
     float promedio() {
         //Calcular el promedio del promedio de los cursos
-        
-        return 0;
+        float sum = 0;
+        for(int i = 0; i < numEstudiantes; i++)
+        {
+            sum += getEstudiante(i).promedio();
+        }
+
+        float prom = sum / (float)numEstudiantes;
+
+        return prom;
     }
 
     string to_string() {
@@ -229,15 +273,23 @@ public:
     }
 
     int getNumEstudiantes() {
-        //Retorne el número de estudiantes
         return numEstudiantes;
     }
 
-    int compareTo(Curso e) {
+    int compareTo(Curso &e) {
         /*Defina el algoritmo de comparación entre cursos
         */
         
-
+        if(criterio)
+        {
+            if(numEstudiantes > e.getNumEstudiantes()) return 1;
+            else if(numEstudiantes < e.getNumEstudiantes()) return -1;
+        }
+        else
+        {
+            if(promedio() > e.promedio()) return 1;
+            else if(promedio() < e.promedio()) return -1;
+        }
         return 0; //Retorna 0 si son iguales
     }
 
@@ -309,9 +361,12 @@ public:
         return false;
     }
 
-    Curso& operator=(Curso other) {
+    Curso& operator=(Curso &other) {
         //Implemente la asignación directa entre cursos. Siga el ejemplo de los programas hechos en clase.
         
+        id = other.id;
+        numEstudiantes = other.getNumEstudiantes();
+        numNotas = other.numNotas;
 
         this->estudiantes.clear();
         for (int i = 0; i < other.getNumEstudiantes(); i++) {
@@ -349,7 +404,7 @@ public:
     void setOrdOrderAsc() {
         //Define el orden como ascendente en todos los estudiantes del Curso
         
-
+        
     }
 
     void setOrdOrderDesc() {

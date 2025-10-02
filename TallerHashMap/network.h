@@ -205,6 +205,7 @@ public:
             cout << "Campo inexistente" << endl;
         }
     }
+    
     void resize()
     {
         int oldCapacity = capacity;

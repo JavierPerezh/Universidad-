@@ -300,6 +300,50 @@ public:
 
     }
 
+    void heapifyD(int i, int n)
+    {
+        T min = v[i];
+        int minind = i;
+
+        if (der(i) < n) { //Si el nodo no es hoja
+            if (v[der(i)] < min) {
+                min = v[der(i)];
+                minind = der(i);
+            }
+            if (izq(i) < n && v[izq(i)] < min) {
+                min = v[izq(i)];
+                minind = izq(i);
+            }
+            if (v[i] != min) {
+                T temp = v[i];
+                v[i] = min;
+                v[minind] = temp;
+                heapify(minind, n);
+            }
+
+        }
+    }
+
+    void sortD()
+    {
+        for (int i = (size / 2) - 1; i >= 0; i--) {
+            //cout<<"entre"<<i<<endl;
+            heapifyD(i, size);
+        }
+
+        T temp;
+        for (int i = size - 1; i >= 0; i--) {
+            temp = v[i];
+            v[i] = v[0];
+            v[0] = temp;
+            heapifyD(0, i);
+
+            /*print();
+            cout<<endl;
+            */
+        }
+    }
+
     int search(T t) {
         return search(t, 0, size - 1);
     }
