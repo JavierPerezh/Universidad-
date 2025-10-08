@@ -172,4 +172,7 @@ class Fichas:
         print(Otoria(lista))
         return Otoria(lista)
 """
-    
+f = Fichas()
+a = inorder_to_tree(f.reglas[1])
+I = a.SATtableaux()
+f.visualizar(I)

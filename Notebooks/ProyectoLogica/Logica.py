@@ -80,6 +80,8 @@ class Formula :
                     return 4, 'alfa'
                 elif self.subf.conectivo == 'Y':
                     return 1, 'beta'
+                elif self.subf.conectivo == '=':
+                    return 4, 'beta'
         elif type(self) == Binario:
             if self.conectivo == 'Y':
                 return 2, 'alfa'
@@ -87,6 +89,8 @@ class Formula :
                 return 2, 'beta'
             elif self.conectivo == '>':
                 return 3, 'beta'
+            elif self.conectivo == '=':
+                return 5, 'alfa'
 
     def SATtableaux(self):
         estado = nodos_tableaux([self])
@@ -336,6 +340,8 @@ class nodos_tableaux:
                 formulas = [Negacion(f.subf.left), Negacion(f.subf.right)]
             elif num_regla == 4:
                 formulas = [f.subf.left, Negacion(f.subf.right)]
+            elif num_regla == 5:
+                formulas = [Binario('>', f.left, f.right), Binario('>', f.right, f.left)]
             for nueva_f in formulas:
                 clasf = nueva_f.clasifica_para_tableaux()
                 if clasf[1]== 'alfa':
@@ -363,6 +369,9 @@ class nodos_tableaux:
             elif num_regla == 3:
                 B1 = Negacion(f.left)
                 B2 = f.right
+            elif num_regla == 4:
+                B1 = Binario('Y', f.subf.left, Negacion(f.subf.right))
+                B2 = Binario('Y', Negacion(f.subf.left), f.subf.right)
             f_alfas2 = deepcopy(f_alfas)
             f_betas2 = deepcopy(f_betas)
             f_literales2 = deepcopy(f_literales)
