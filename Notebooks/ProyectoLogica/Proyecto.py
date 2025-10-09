@@ -96,8 +96,6 @@ class Fichas:
             casilla2 = self.FichaEn.ravel([x,z,f])
             form = '(' + casilla1 + '=' + casilla2 + ')'
             lista.append(form)
-        print("===========Regla 2============")
-        print(Ytoria(lista))
         return Ytoria(lista)
     
     #Solo puede haber una ficha en cada casilla 
@@ -114,8 +112,6 @@ class Fichas:
                 lista_o.append(casilla2)
             form = '(' + casilla1 + '>-' + Otoria(lista_o) + ')' 
             lista.append(form)
-        print("===========Regla 3============")
-        print(Ytoria(lista))
         return Ytoria(lista)
 
     #No puede repetirse la misma figura en una fila
@@ -132,8 +128,6 @@ class Fichas:
                 lista_o.append(casilla2)
             form = '(' + casilla1 + '>-' + Otoria(lista_o) + ')'
             lista.append(form)
-        print("===========Regla 4============")
-        print(Ytoria(lista))
         return Ytoria(lista)
     
     def visualizar(self, I):
