@@ -34,43 +34,59 @@ class Fichas:
         regla2 = self.regla2()
         regla3 = self.regla3()
         regla4 = self.regla4()
-        self.reglas = [regla1, regla2, regla3, regla4]
+        regla5 = self.regla5()
+        regla6 = self.regla6()
+        regla7 = self.regla7()
+        self.reglas = [regla1, regla2, regla3, regla4, regla5, regla6, regla7]
 
         #Metodo para escribir
         self.FichaEn.escribir = MethodType(escribirFichas, self.FichaEn)
 
-    #Debe haber minimo dos casillas ocupadas (No pueden haber ni 0 ni 1 casilla ocupada)
-    def regla1(self):
-        todas_posiciones = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
-        
-        formulas_negadas = ['-' + self.FichaEn.ravel([*pos]) for pos in todas_posiciones]
-        formula_cero_fichas = Ytoria(formulas_negadas)
-        
-        formulas_una_ficha = []
-        for pos in todas_posiciones:
-            casilla_actual = self.FichaEn.ravel([*pos])
-
-            otras_negadas = []
-            for otra_pos in todas_posiciones:
-                if otra_pos != pos:
-                    otra_casilla = self.FichaEn.ravel([*otra_pos])
-                    otras_negadas.append('-' + otra_casilla)
+    #Debe haber minimo un circulo
+    def regla1():
+        casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
+        lista = []
+        for i in range(len(casillas)):
+            x,y = casillas[i]
+            casilla_cir = self.FichaEn.ravel([x,y,2])
+            lista.append(casilla_cir)
+        return Otoria(lista)
             
-            formula_esta_sola = '(' + casilla_actual + 'Y' + Ytoria(otras_negadas) + ')'
-            formulas_una_ficha.append(formula_esta_sola)
+    #Debe haber minimo un triangulo 
+    def regla2():
+        casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
+        lista = []
+        for i in range(len(casillas)):
+            x,y = casillas[i]
+            casilla_tri = self.FichaEn.ravel([x,y,0])
+            lista.append(casilla_tri)
+        return Otoria(lista)
         
-        formula_exactamente_una = Otoria(formulas_una_ficha)
-
-        formula_max_una = '(' + formula_cero_fichas + 'O' + formula_exactamente_una + ')'
-
-        regla = '-' + formula_max_una
+    #Debe haber minimo un cuadrado
+    def regla3():
+        casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
+        lista = []
+        for i in range(len(casillas)):
+            x,y = casillas[i]
+            casilla_cua = self.FichaEn.ravel([x,y,1])
+            lista.append(casilla_cua)
+        return Otoria(lista)
         
-        print("Regla 1 (mínimo 2 casillas ocupadas):")
-        print(regla)
-        return regla
-    
+    #No pueden haber filas vacias
+    def regla4():
+        casillas = [(y,f) for y in range(self.Ny) for f in range(self.Nf)]
+        lista = []
+        for i in range(len(casillas)):
+            y,f = casillas[i]
+            lista_o = []
+            for x in range(self.Nx):
+                casilla = self.FichaEn.ravel([x,y,f])
+                lista_o.append(casilla)
+            lista.append(Otoria(lista_o))
+        return Ytoria(lista)
+            
     #Debe existir simetria horizontal 
-    def regla2(self):
+    def regla5(self):
         casillas = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
         lista = []
         for i in range(len(casillas)):
@@ -85,7 +101,7 @@ class Fichas:
         return Ytoria(lista)
     
     #Solo puede haber una ficha en cada casilla 
-    def regla3(self):
+    def regla6(self):
         casillas = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
         lista = []
         for i in range(len(casillas)):
@@ -103,7 +119,7 @@ class Fichas:
         return Ytoria(lista)
 
     #No puede repetirse la misma figura en una fila
-    def regla4(self):
+    def regla7(self):
         casillas = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
         lista = []
         for i in range(len(casillas)):
@@ -172,7 +188,3 @@ class Fichas:
         print(Otoria(lista))
         return Otoria(lista)
 """
-f = Fichas()
-a = inorder_to_tree(f.reglas[1])
-I = a.SATtableaux()
-f.visualizar(I)
