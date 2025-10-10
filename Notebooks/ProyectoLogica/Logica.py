@@ -101,7 +101,7 @@ class Formula :
             return estado.interp()
         frontera = [estado]
         while len(frontera) > 0:
-            estado = frontera.pop(0)
+            estado = frontera.pop()
             hijos = estado.expandir()
             for a in hijos:
                 if a != None:
