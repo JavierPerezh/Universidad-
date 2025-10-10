@@ -43,7 +43,7 @@ class Fichas:
         self.FichaEn.escribir = MethodType(escribirFichas, self.FichaEn)
 
     #Debe haber minimo un circulo
-    def regla1():
+    def regla1(self):
         casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
         lista = []
         for i in range(len(casillas)):
@@ -53,7 +53,7 @@ class Fichas:
         return Otoria(lista)
             
     #Debe haber minimo un triangulo 
-    def regla2():
+    def regla2(self):
         casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
         lista = []
         for i in range(len(casillas)):
@@ -63,7 +63,7 @@ class Fichas:
         return Otoria(lista)
         
     #Debe haber minimo un cuadrado
-    def regla3():
+    def regla3(self):
         casillas = [(x,y) for x in range(self.Nx) for y in range(self.Ny)]
         lista = []
         for i in range(len(casillas)):
@@ -72,17 +72,16 @@ class Fichas:
             lista.append(casilla_cua)
         return Otoria(lista)
         
-    #No pueden haber filas vacias
-    def regla4():
-        casillas = [(y,f) for y in range(self.Ny) for f in range(self.Nf)]
+    # No pueden haber filas vacías
+    def regla4(self):
         lista = []
-        for i in range(len(casillas)):
-            y,f = casillas[i]
-            lista_o = []
-            for x in range(self.Nx):
-                casilla = self.FichaEn.ravel([x,y,f])
-                lista_o.append(casilla)
-            lista.append(Otoria(lista_o))
+        for y in range(self.Ny): 
+            figuras_en_fila = []
+            for x in range(self.Nx):  
+                for f in range(self.Nf):  
+                    casilla = self.FichaEn.ravel([x, y, f])
+                    figuras_en_fila.append(casilla)
+            lista.append(Otoria(figuras_en_fila))
         return Ytoria(lista)
             
     #Debe existir simetria horizontal 
@@ -100,34 +99,29 @@ class Fichas:
     
     #Solo puede haber una ficha en cada casilla 
     def regla6(self):
-        casillas = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
         lista = []
-        for i in range(len(casillas)):
-            x,y,f = casillas[i]
-            lista_o = []
-            otras_figuras = [g for g in range(self.Nf) if g != f]
-            casilla1 = self.FichaEn.ravel([x,y,f])
-            for g in otras_figuras:
-                casilla2 = self.FichaEn.ravel([x,y,g])
-                lista_o.append(casilla2)
-            form = '(' + casilla1 + '>-' + Otoria(lista_o) + ')' 
-            lista.append(form)
+        for x in range(self.Nx):
+            for y in range(self.Ny):
+                for f1 in range(self.Nf):
+                    for f2 in range(f1 + 1, self.Nf):  # solo pares distintos
+                        p1 = self.FichaEn.ravel([x, y, f1])
+                        p2 = self.FichaEn.ravel([x, y, f2])
+                        # cláusula: (-p1 O -p2)
+                        form = f"(-{p1}O-{p2})"
+                        lista.append(form)
         return Ytoria(lista)
 
     #No puede repetirse la misma figura en una fila
     def regla7(self):
-        casillas = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
         lista = []
-        for i in range(len(casillas)):
-            x,y,f = casillas[i]
-            otras_columnas = [c for c in range(self.Nx) if c != x]
-            lista_o = []
-            casilla1 = self.FichaEn.ravel([x,y,f])
-            for c in otras_columnas:
-                casilla2 = self.FichaEn.ravel([c,y,f])
-                lista_o.append(casilla2)
-            form = '(' + casilla1 + '>-' + Otoria(lista_o) + ')'
-            lista.append(form)
+        for y in range(self.Ny):
+            for f in range(self.Nf):
+                for x1 in range(self.Nx):
+                    for x2 in range(x1 + 1, self.Nx):  
+                        p1 = self.FichaEn.ravel([x1, y, f])
+                        p2 = self.FichaEn.ravel([x2, y, f])
+                        form = f"(-{p1}O-{p2})"
+                        lista.append(form)
         return Ytoria(lista)
     
     def visualizar(self, I):
@@ -147,7 +141,7 @@ class Fichas:
 
         for l in I:
             if I[l]:
-                x,y,f = self.FichaEn.unravel(l)
+                x, y, f = self.FichaEn.unravel(l)
                 x_centro = x + 0.5
                 y_centro = (self.Ny - 1 - y) + 0.5
                 imagebox = OffsetImage(imagenes[f], zoom = 0.27)

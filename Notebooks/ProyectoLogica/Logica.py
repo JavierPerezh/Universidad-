@@ -2,7 +2,7 @@
 Librería con las clases y funciones
 para lógica proposicional
 '''
-
+from random import choice
 from itertools import product
 import numpy as np
 from copy import deepcopy
@@ -133,6 +133,17 @@ class Formula :
                 except:
                     raise("¡Caracter inválido!")
         return ''.join(vis)
+    
+    def num_conec(self):
+        """
+        Cuenta el número de conectivos en la fórmula
+        """
+        if type(self) == Letra:
+            return 0
+        elif type(self) == Negacion:
+            return 1 + self.subf.num_conec()
+        elif type(self) == Binario:
+            return 1 + self.left.num_conec() + self.right.num_conec()
 
 class Letra(Formula) :
     def __init__ (self, letra:str) :
@@ -406,3 +417,269 @@ class nodos_tableaux:
             return [n1, n2]
         else:
             return []
+
+
+def complemento(l):
+    """
+    Calcula el complemento de un literal
+    Input: l, literal (string)
+    Output: complemento de l (string)
+    """
+    if l[0] == '-':
+        return l[1:]
+    else:
+        return '-' + l
+
+def eliminar_literal(S, l):
+    """
+    Elimina un literal de un conjunto de cláusulas
+    Input: 
+        - S, conjunto de cláusulas
+        - l, literal a eliminar
+    Output: conjunto de cláusulas modificado
+    """
+    S1 = [c for c in S if l not in c]
+    lc = complemento(l)
+    return [[p for p in c if p != lc] for c in S1]
+
+def extender_I(I, l):
+    """
+    Extiende una interpretación con un nuevo literal
+    Input:
+        - I, interpretación actual (diccionario)
+        - l, literal a agregar
+    Output: interpretación extendida
+    """
+    I1 = I.copy()
+    if '-' in l:
+        I1[l[1:]] = False
+    else:
+        I1[l] = True
+    return I1
+
+def unit_propagate(S, I):
+    """
+    Aplica propagación unitaria a un conjunto de cláusulas
+    Input:
+        - S, conjunto de cláusulas
+        - I, interpretación parcial
+    Output:
+        - S, conjunto de cláusulas después de propagación
+        - I, interpretación extendida
+    """
+    while [] not in S:
+        l = ''
+        for x in S:
+            if len(x) == 1:
+                l = x[0]
+                # Verificar si el literal no está vacío
+                if l == '':
+                    S.remove(x)  # Eliminar la cláusula problemática
+                    l = ''  # Resetear l para continuar
+                    break
+                S = eliminar_literal(S, l)
+                I = extender_I(I, l)
+                break
+        if l == '': 
+            break
+    return S, I
+
+def filtrar_interpretacion(I, descriptor):
+    """
+    Filtra una interpretación I para conservar solo las letras
+    que fueron creadas por el descriptor dado.
+    """
+    letras_validas = [
+        descriptor.ravel([x, y, f])
+        for x in range(descriptor.args_lista[0])
+        for y in range(descriptor.args_lista[1])
+        for f in range(descriptor.args_lista[2])
+    ]
+    return {l: v for l, v in I.items() if l in letras_validas}
+
+
+def dpll(S, I, descriptor=None):
+    """
+    Algoritmo DPLL para verificar satisfacibilidad
+    Input:
+        - S: conjunto de cláusulas
+        - I: interpretación parcial
+        - descriptor: (opcional) objeto Descriptor que define las letras válidas
+    Output:
+        - String: "Satisfacible" o "Insatisfacible"
+        - I: interpretación que satisface S (si es satisfacible)
+    """
+    # Paso 1: Aplicar propagación unitaria
+    limpiar_clausulas(S)
+    S, I = unit_propagate(S, I)
+    
+    # Paso 2: Si hay cláusula vacía, es insatisfacible
+    if [] in S:
+        return "Insatisfacible", {}
+    
+    # Paso 3: Si no hay cláusulas, es satisfacible
+    if len(S) == 0:
+        # Si hay descriptor, filtramos antes de retornar
+        if descriptor is not None:
+            I = filtrar_interpretacion(I, descriptor)
+        return "Satisfacible", I
+    
+    # Paso 4: Seleccionar literal no asignado
+    literales_no_asignados = []
+    for clausula in S:
+        for literal in clausula:
+            atomo = literal[1:] if literal[0] == '-' else literal
+            if atomo not in I:
+                literales_no_asignados.append(literal)
+    
+    if not literales_no_asignados:
+        return "Insatisfacible", {}
+    
+    l = choice(literales_no_asignados)
+    
+    # Paso 5-7: Probar con l = True
+    S_prime = eliminar_literal(S, l)
+    I_prime = extender_I(I, l)
+    resultado, I_resultado = dpll(S_prime, I_prime, descriptor)
+    if resultado == "Satisfacible":
+        return "Satisfacible", I_resultado
+    
+    # Paso 8-11: Probar con l = False (complemento de l)
+    lc = complemento(l)
+    S_double_prime = eliminar_literal(S, lc)
+    I_double_prime = extender_I(I, lc)
+    
+    return dpll(S_double_prime, I_double_prime, descriptor)
+
+
+def a_clausal(A):
+    """
+    Convierte equivalencias a forma clausal
+    Input: A (cadena) de la forma:
+           p=-q
+           p=(qYr)
+           p=(qOr) 
+           p=(q>r)
+           p=(q=r)
+    Output: lista de cláusulas
+    """
+    assert(len(A)==4 or len(A)==7), "Fórmula incorrecta!"
+    B = ''
+    p = A[0]
+    
+    if "-" in A:
+        q = A[-1]
+        B = "-"+p+"O-"+q+"Y"+p+"O"+q
+    elif "Y" in A:
+        q = A[3]
+        r = A[5]
+        B = q+"O-"+p+"Y"+r+"O-"+p+"Y-"+q+"O-"+r+"O"+p
+    elif "O" in A:
+        q = A[3]
+        r = A[5]
+        B = "-"+q+"O"+p+"Y-"+r+"O"+p+"Y"+q+"O"+r+"O-"+p
+    elif ">" in A:
+        q = A[3]
+        r = A[5]
+        B = q+"O"+p+"Y-"+r+"O"+p+"Y-"+q+"O"+r+"O-"+p
+    elif "=" in A:
+        q = A[3]
+        r = A[5]
+        B = q+"O"+"-"+r+"O"+"-"+p+"Y"+"-"+q+"O"+r+"O"+"-"+p+"Y"+"-"+q+"O"+"-"+r+"O"+p+"Y"+q+"O"+r+"O"+p
+    else:
+        print('Error en a_clausal(): Fórmula incorrecta!')
+    
+    # Convertir a lista de listas
+    B = B.split('Y')
+    B = [c.split('O') for c in B]
+    return B
+
+def tseitin(A):
+    '''
+    Algoritmo de transformación de Tseitin
+    Input: A (cadena) en notación inorder
+    Output: B, lista de cláusulas
+    '''
+    # Creamos letras proposicionales nuevas
+    f = inorder_to_tree(A)
+    letrasp = f.letras()
+    cods_letras = [ord(x) for x in letrasp]
+    m = max(cods_letras) + 256 if cods_letras else 256
+    letrasp_tseitin = [chr(x) for x in range(m, m + f.num_conec())]
+    letrasp = list(letrasp) + letrasp_tseitin
+    
+    L = [] # Lista de definiciones
+    Pila = [] # Pila para procesamiento
+    i = -1 # Contador de variables nuevas
+    s = A[0] # Símbolo de trabajo actual
+    cadena_restante = A[1:] # Resto de la cadena
+    
+    while len(A) > 0:
+        # print("Pila:", Pila, " L:", L, " s:", s)
+        
+        if (s in letrasp) and (len(Pila) > 0) and (Pila[-1] == '-'):
+            # Caso: negación de un literal
+            i += 1
+            atomo = letrasp_tseitin[i]
+            Pila = Pila[:-1] # Quitar el '-'
+            Pila.append(atomo)
+            L.append(atomo + "=-" + s)
+            A = cadena_restante
+            if len(A) > 0:
+                s = A[0]
+                cadena_restante = A[1:]
+                
+        elif s == ')':
+            # Procesar subfórmula completa
+            w = Pila[-1]  # Segundo operando
+            O = Pila[-2]  # Operador  
+            v = Pila[-3]  # Primer operando
+            Pila = Pila[:len(Pila)-4] # Quitar los 4 elementos
+            
+            i += 1
+            atomo = letrasp_tseitin[i]
+            L.append(atomo + "=(" + v + O + w + ")")
+            Pila.append(atomo)
+            A = cadena_restante
+            if len(A) > 0:
+                s = A[0]
+                cadena_restante = A[1:]
+                
+        else:
+            Pila.append(s)
+            A = cadena_restante
+            if len(A) > 0:
+                s = A[0]
+                cadena_restante = A[1:]
+            else:
+                s = ''
+    
+    # CORRECCIÓN: Determinar el átomo raíz de manera segura
+    if i >= 0:
+        # Caso normal: hay variables Tseitin creadas
+        atomo = letrasp_tseitin[i]
+    elif Pila and Pila[-1] in letrasp:
+        # Caso: la fórmula es solo un literal
+        atomo = Pila[-1]
+    else:
+        # Caso de error: no se pudo determinar el átomo raíz
+        raise Exception("No se pudo determinar el átomo raíz en Tseitin")
+    
+    # Construir el resultado final
+    B = [[atomo]]  # La fórmula completa es equivalente al átomo raíz
+    for definicion in L:
+        clausulas = a_clausal(definicion)
+        B.extend(clausulas)
+    
+    return B
+
+def limpiar_clausulas(S):
+    """
+    Limpia cláusulas eliminando literales vacíos y cláusulas problemáticas
+    """
+    S_limpio = []
+    for clausula in S:
+        clausula_limpia = [lit for lit in clausula if lit != '']
+        if clausula_limpia:  
+            S_limpio.append(clausula_limpia)
+    return S_limpio
