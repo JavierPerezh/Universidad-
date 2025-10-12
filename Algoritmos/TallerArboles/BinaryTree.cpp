@@ -151,7 +151,6 @@ public:
         destroyTree(root);
     }
 
-    // Métodos básicos
     void insert(T value) {
         root = insertNode(root, value);
     }
@@ -231,10 +230,8 @@ public:
 };
 
 int main() {
-    // Prueba del árbol básico
     BinaryTree<int> arbol;
     
-    // Insertar elementos
     arbol.insert(50);
     arbol.insert(30);
     arbol.insert(70);
@@ -245,28 +242,27 @@ int main() {
     
     cout << "=== ARBOL ORIGINAL ===" << endl;
     arbol.displayTree();
-    arbol.display(0); // inOrder
-    arbol.display(1); // preOrder  
-    arbol.display(2); // postOrder
+    arbol.display(0);
+    arbol.display(1);
+    arbol.display(2);
     cout << "Altura: " << arbol.height() << endl;
     cout << "Total nodos: " << arbol.count() << endl;
 
-    // Prueba de constructores desde arreglos
     int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     cout << "\n=== ARBOLES DESDE ARREGLOS ===" << endl;
     
-    BinaryTree<int> arbol1(0, arr, 10); // inOrder
+    BinaryTree<int> arbol1(0, arr, 10); 
     cout << "Arbol desde inOrder:" << endl;
     arbol1.displayTree();
     arbol1.display(0);
     
-    BinaryTree<int> arbol2(1, arr, 10); // preOrder
+    BinaryTree<int> arbol2(1, arr, 10); 
     cout << "\nArbol desde preOrder:" << endl;
     arbol2.displayTree();
     arbol2.display(1);
     
-    BinaryTree<int> arbol3(2, arr, 10); // postOrder
+    BinaryTree<int> arbol3(2, arr, 10); 
     cout << "\nArbol desde postOrder:" << endl;
     arbol3.displayTree();
     arbol3.display(2);
