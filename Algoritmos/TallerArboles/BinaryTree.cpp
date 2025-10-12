@@ -168,7 +168,6 @@ public:
         return countNodes(root);
     }
 
-    // Métodos de recorrido que devuelven arreglos
     T* inOrder(int& sizeOut) {
         Vector<T> arr;
         inOrderNode(root, arr);
@@ -202,7 +201,6 @@ public:
         return arreglo;
     }
 
-    // Métodos de visualización
     void display(int order) {
         int sizeArr;
         T* arr;
@@ -226,7 +224,6 @@ public:
         delete[] arr;
     }
 
-    // Display jerárquico (del primer código)
     void displayTree() {
         cout << "Estructura del arbol:" << endl;
         displayNode(root);
