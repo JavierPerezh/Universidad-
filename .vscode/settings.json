@@ -7,6 +7,23 @@
         "format": "cpp",
         "initializer_list": "cpp",
         "span": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "atomic": "cpp",
+        "bit": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "algorithm": "cpp",
+        "memory_resource": "cpp",
+        "memory": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp"
     }
 }
