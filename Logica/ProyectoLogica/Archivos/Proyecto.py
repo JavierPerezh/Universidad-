@@ -177,4 +177,4 @@ class Fichas:
         print(Otoria(lista))
         return Otoria(lista)
 """
-from Logica.dpll import * 
+from Archivos.dpll import * 
