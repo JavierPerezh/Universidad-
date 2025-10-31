@@ -1,5 +1,6 @@
 from itertools import combinations
-from Logica import *
+from Logica.Logica import *
+from Logica.tsitin import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
@@ -176,3 +177,4 @@ class Fichas:
         print(Otoria(lista))
         return Otoria(lista)
 """
+from Logica.dpll import * 
