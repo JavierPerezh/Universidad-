@@ -1,4 +1,4 @@
-from Logica.Logica import *
+from Archivos.Logica import *
 
 def a_clausal(A):
     # Subrutina de Tseitin para encontrar la FNC de

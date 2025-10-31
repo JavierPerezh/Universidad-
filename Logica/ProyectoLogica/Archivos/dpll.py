@@ -1,6 +1,6 @@
 from random import choice
-from Logica.Proyecto import Fichas
-f = Fichas()
+from Archivos.Proyecto import Fichas
+p = Fichas()
 
 def complemento(l):
     if '-' in l:
@@ -81,7 +81,7 @@ def dpll(S, I):
         Ipp = extender_I(I, complemento(l))
         return dpll(Spp,Ipp)
     
-def filtrar_interpretacion(I, descriptor = f.FichaEn):
+def filtrar_interpretacion(I, descriptor = p.FichaEn):
     """
     Filtra una interpretación I para conservar solo las letras
     que fueron creadas por el descriptor dado.

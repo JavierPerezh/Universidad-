@@ -1,6 +1,6 @@
 from itertools import combinations
-from Logica.Logica import *
-from Logica.tsitin import *
+from Archivos.Logica import *
+from Archivos.tsitin import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
