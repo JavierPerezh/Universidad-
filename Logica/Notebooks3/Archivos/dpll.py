@@ -85,16 +85,11 @@ def filtrar_interpretacion(I, descriptor = p.FichaEn):
     """
     Filtra una interpretación I para conservar solo las letras
     que fueron creadas por el descriptor dado.
-    Válida para descriptores con cualquier número de argumentos.
     """
-    # Generar todas las combinaciones posibles de argumentos
-    from itertools import product
-    rangos = [range(n) for n in descriptor.args_lista]
-    
-    # Generar todas las letras válidas posibles
     letras_validas = [
-        descriptor.ravel(list(combinacion))
-        for combinacion in product(*rangos)
+        descriptor.ravel([x, y, f])
+        for x in range(descriptor.args_lista[0])
+        for y in range(descriptor.args_lista[1])
+        for f in range(descriptor.args_lista[2])
     ]
-    
     return {l: v for l, v in I.items() if l in letras_validas}
