@@ -1,4 +1,12 @@
-#include "archivos/utilidades.h"
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+
+using namespace std;
 
 class User
 {
@@ -8,18 +16,18 @@ public:
     string city;
     string job;
 
-    User(int id, string name, string city, string job) : id(id), name(name), city(city), job(job) {}
+    User(int id, const string &name, const string &city, const string &job)
+        : id(id), name(name), city(city), job(job) {}
 };
 
 class SocialNetworkGraph
 {
 private:
-    unordered_map<int, User*> users;
+    unordered_map<int, User *> users;
     unordered_map<int, vector<int>> adj;
     string gData = "graphData.txt", uData = "userData.csv";
 
 public:
-    
     void loadFromDataset()
     {
         ifstream graphData(gData);
@@ -76,62 +84,208 @@ public:
 
     void addUser(User &user)
     {
-        int id = user.id;
-        if (users.count(id))
+        if (users.count(user.id))
             return;
-        users[id] = &user;
+        users[user.id] = new User(user.id, user.name, user.city, user.job);
     }
 
-    void removeUser(int user)
+    void removeUser(int id)
     {
-        if (adj.count(user) == 0)
+        if (!users.count(id))
             return;
-        vector<int> &userfriends = adj[user];
-        for (int other : userfriends)
-        {
-            removeEdge(other, user);
-        }
-        adj.erase(user);
-        users.erase(user);
+
+        for (int other : adj[id])
+            removeEdge(other, id);
+
+        adj.erase(id);
+        delete users[id];
+        users.erase(id);
     }
 
     void addEdge(int u, int v)
     {
-        if (u == v) return;
-        if (!users.count(u)) return;
-        if(!users.count(v)) return;
+        if (u == v)
+            return;
+        if (!users.count(u) || !users.count(v))
+            return;
 
-        vector<int> &ufriends = adj[u];
-        vector<int> &vfriends = adj[v];
+        auto &Uf = adj[u];
+        auto &Vf = adj[v];
 
-        if (search(ufriends, v) != -1 || search(vfriends, u) != -1) return;
+        if (find(Uf.begin(), Uf.end(), v) != Uf.end())
+            return;
 
-        int posU = insertPos(ufriends, v);
-        int posV = insertPos(vfriends, u);
-
-        ufriends.insert(ufriends.begin() + posU, v);
-        vfriends.insert(vfriends.begin() + posV, u);
+        Uf.insert(lower_bound(Uf.begin(), Uf.end(), v), v);
+        Vf.insert(lower_bound(Vf.begin(), Vf.end(), u), u);
     }
 
     void removeEdge(int u, int v)
     {
-        if (u == v)
-            return;
-        vector<int> &ufriends = adj[u];
-        vector<int> &vfriends = adj[v];
+        auto &Uf = adj[u];
+        auto &Vf = adj[v];
 
-        int vpos = search(ufriends, v), upos = search(vfriends, u);
-        if (vpos == -1)
-            return;
-
-        ufriends.erase(ufriends.begin() + vpos);
-        vfriends.erase(vfriends.begin() + upos);
+        Uf.erase(remove(Uf.begin(), Uf.end(), v), Uf.end());
+        Vf.erase(remove(Vf.begin(), Vf.end(), u), Vf.end());
     }
 
     bool areConnected(int u, int v) const
     {
-        if (!adj.count(u)) return false;
-        if (!adj.count(v)) return false;
-        return search(adj.at(u), v) != -1;
+        if (!adj.count(u))
+            return false;
+        return find(adj.at(u).begin(), adj.at(u).end(), v) != adj.at(u).end();
+    }
+
+    vector<int> BFS(int start)
+    {
+        if (!users.count(start))
+            return {};
+
+        unordered_map<int, bool> visited;
+        vector<int> res;
+        queue<int> q;
+
+        q.push(start);
+        visited[start] = true;
+
+        while (!q.empty())
+        {
+            int curr = q.front();
+            q.pop();
+            res.push_back(curr);
+
+            for (int neighbor : adj.at(curr))
+            {
+                if (!visited[neighbor])
+                {
+                    visited[neighbor] = true;
+                    q.push(neighbor);
+                }
+            }
+        }
+        return res;
+    }
+
+    void DFSUtil(int node, vector<bool> &visited, vector<int> &res) const
+    {
+        visited[node] = true;
+        res.push_back(node);
+
+        if (!adj.count(node))
+            return;
+
+        for (int neighbor : adj.at(node))
+        {
+            if (!visited[neighbor])
+                DFSUtil(neighbor, visited, res);
+        }
+    }
+
+    vector<int> DFS(int start) const
+    {
+        if (!users.count(start))
+            return {};
+
+        vector<bool> visited(200000, false);
+        vector<int> res;
+
+        DFSUtil(start, visited, res);
+        return res;
+    }
+
+    vector<int> shortestPath(int start, int target) const
+    {
+        if (!users.count(start) || !users.count(target))
+            return {};
+
+        unordered_map<int, bool> visited;
+        unordered_map<int, int> prev;
+        queue<int> q;
+
+        q.push(start);
+        visited[start] = true;
+
+        while (!q.empty())
+        {
+            int curr = q.front();
+            q.pop();
+
+            if (curr == target)
+                break;
+
+            for (int next : adj.at(curr))
+            {
+                if (!visited[next])
+                {
+                    visited[next] = true;
+                    prev[next] = curr;
+                    q.push(next);
+                }
+            }
+        }
+
+        if (!visited[target])
+            return {};
+
+        vector<int> path;
+        for (int at = target; at != start; at = prev[at])
+            path.push_back(at);
+        path.push_back(start);
+
+        reverse(path.begin(), path.end());
+        return path;
+    }
+
+    vector<int> mutualFriends(int a, int b) const
+    {
+        vector<int> res;
+        if (!adj.count(a) || !adj.count(b))
+            return res;
+
+        const auto &A = adj.at(a);
+        const auto &B = adj.at(b);
+
+        set_intersection(
+            A.begin(), A.end(),
+            B.begin(), B.end(),
+            back_inserter(res));
+
+        return res;
+    }
+
+    vector<int> filterByCity(const string &city) const
+    {
+        vector<int> result;
+        for (auto &p : users)
+            if (p.second->city == city)
+                result.push_back(p.first);
+        return result;
+    }
+
+    vector<int> filterByJob(const string &job) const
+    {
+        vector<int> result;
+        for (auto &p : users)
+            if (p.second->job == job)
+                result.push_back(p.first);
+        return result;
+    }
+
+    vector<int> sortByDegree(bool desc) const
+    {
+        vector<pair<int, int>> degrees;
+
+        for (auto &p : adj)
+            degrees.push_back({p.first, (int)p.second.size()});
+
+        sort(degrees.begin(), degrees.end(),
+             [&](auto &a, auto &b)
+             {
+                 return desc ? a.second > b.second : a.second < b.second;
+             });
+
+        vector<int> res;
+        for (auto &p : degrees)
+            res.push_back(p.first);
+        return res;
     }
 };
