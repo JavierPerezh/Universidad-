@@ -23,7 +23,7 @@ public:
 class SocialNetworkGraph
 {
 private:
-    unordered_map<int, User *> users;
+    unordered_map<int, User*> users;
     unordered_map<int, vector<int>> adj;
     string gData = "graphData.txt", uData = "userData.csv"; //gData: conexiones entre nodos, uData: informacion de cada usuario (sin conexiones)
 
@@ -34,11 +34,11 @@ public:
     contiene IDs y su conexion de la forma: 
                                                 0 1
                                                 0 2
-                                                1 10
+                                                1 3
                                                 ...
     para no dejar cada usuario con tan poca información, se uso un script de python que genera un archivo .csv con la informacion de nombre, ciudad y profesión para todos
-    los nodos del grafo. 
-    */
+    los nodos del grafo. En la entrega tambien se inclute el script usado
+        */
 
     void loadFromDataset()
     {
