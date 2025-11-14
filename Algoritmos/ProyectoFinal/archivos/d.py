@@ -3,10 +3,8 @@ import random
 from faker import Faker
 
 def generar_csv_facebook():
-    # Configurar Faker para datos en español
     fake = Faker('es_ES')
     
-    # Listas de datos predefinidos para consistencia
     ciudades = [
         "Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga", "Murcia", 
         "Palma", "Las Palmas", "Bilbao", "Alicante", "Córdoba", "Valladolid", "Vigo", 
@@ -25,9 +23,8 @@ def generar_csv_facebook():
         "Consultor", "Gerente de Proyectos", "Arqueólogo", "Biólogo", "Químico"
     ]
     
-    # Generar datos
     datos = []
-    for id in range(4039):  # 4039 registros (1 a 4039)
+    for id in range(4039):  
         nombre = fake.name()
         ciudad = random.choice(ciudades)
         profesion = random.choice(profesiones)
