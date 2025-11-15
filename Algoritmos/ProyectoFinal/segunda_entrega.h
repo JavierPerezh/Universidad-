@@ -8,6 +8,7 @@
 
 using namespace std;
 
+//Definicion de la clase User (Nodos del grafo) y SocialNetworkGraph (Grafo de la red social)
 class User
 {
 public:
@@ -23,23 +24,24 @@ public:
 class SocialNetworkGraph
 {
 private:
-    unordered_map<int, User*> users;
-    unordered_map<int, vector<int>> adj;
+    unordered_map<int, User*> users; // Mapa de ID de usuario a puntero de objeto User
+    unordered_map<int, vector<int>> adj; // Lista de adyacencia: ID de usuario a lista de IDs de amigos
     string gData = "graphData.txt", uData = "userData.csv"; //gData: conexiones entre nodos, uData: informacion de cada usuario (sin conexiones)
 
 public:
 
     /*
     IMPORTANTE: El data set usado es de la base de datos SNAP de stanford https://snap.stanford.edu/data/egonets-Facebook.html, cuyo archivo facebook_combined.txt solo 
-    contiene IDs y su conexion de la forma: 
+    contiene IDs y sus conexiones de la forma: 
                                                 0 1
                                                 0 2
                                                 1 3
                                                 ...
-    para no dejar cada usuario con tan poca información, se uso un script de python que genera un archivo .csv con la informacion de nombre, ciudad y profesión para todos
+    para no dejar cada usuario con tan poca información, se uso un script de python que genera un archivo .csv con la informacion de id, nombre, ciudad y profesión para todos
     los nodos del grafo. En la entrega tambien se inclute el script usado
-        */
+    */
 
+    //Codigo para cargar el grafo desde los archivos de dataset
     void loadFromDataset()
     {
         ifstream graphData(gData);
@@ -57,7 +59,8 @@ public:
         }
 
         string line;
-
+        
+        //Leer la informacion del usuario (id, nombre, ciudad, profesion)
         while (getline(userData, line))
         {
             if (line.empty())
@@ -80,6 +83,7 @@ public:
             addUser(u);
         }
 
+        //Leer las conexiones entre usuarios
         int u, v;
         while (graphData >> u >> v)
         {
@@ -94,6 +98,7 @@ public:
         }
     }
 
+    //Agregar usuario al grafo
     void addUser(User &user)
     {
         if (users.count(user.id))
@@ -101,6 +106,7 @@ public:
         users[user.id] = new User(user.id, user.name, user.city, user.job);
     }
 
+    //Agregar conexion entre usuarios
     void addEdge(int u, int v)
     {
         if (u == v)
