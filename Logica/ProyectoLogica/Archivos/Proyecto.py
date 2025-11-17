@@ -157,24 +157,5 @@ class Fichas:
         axes.set_aspect('equal')
         plt.show()
 
-"""
-    def regla1(self):
-        
-        posiciones_fig = [(x,y,f) for x in range(self.Nx) for y in range(self.Ny) for f in range(self.Nf)]
-        lista = []
-
-        for i in range(len(posiciones_fig)):
-            for j in range(i + 1, len(posiciones_fig)):
-                pos1 = posiciones_fig[i]
-                pos2 = posiciones_fig[j]
-                
-                casilla1 = self.FichaEn.ravel([*pos1])
-                casilla2 = self.FichaEn.ravel([*pos2])
-
-                form = '(' + casilla1 + 'Y' + casilla2 + ')'
-                lista.append(form)
-        
-        print(Otoria(lista))
-        return Otoria(lista)
-"""
 from Archivos.dpll import * 
+from Archivos.walkSAT import *

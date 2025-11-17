@@ -41,6 +41,17 @@ public:
         for (auto &p : users)
             delete p.second;
     }
+
+    /*
+    IMPORTANTE: El data set usado es de la base de datos SNAP de stanford https://snap.stanford.edu/data/egonets-Facebook.html, cuyo archivo facebook_combined.txt solo 
+    contiene IDs y sus conexiones de la forma: 
+                                                0 1
+                                                0 2
+                                                1 3
+                                                ...
+    para no dejar cada usuario con tan poca información, se uso un script de python que genera un archivo .csv con la informacion de id, nombre, ciudad y profesión para todos
+    los nodos del grafo. En la entrega tambien se inclute el script usado
+    */
     
     // Cargar datos desde dataset
     void loadFromDataset()
