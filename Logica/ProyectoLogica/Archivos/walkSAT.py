@@ -41,9 +41,9 @@ def flip_literal(I, l):
     return Ip
 
 def WalkSAT(S):
-    max_flips = 10000
-    max_tries = 1000
-    p = 0.37
+    max_flips = 4000
+    max_tries = 800
+    p = 0.632
     for i in range(max_tries):
         w = WalkSatEstado(S)
         for j in range(max_flips):

@@ -7,9 +7,9 @@ def SATsolver(A):
     
     def lit_numero(l):
         if '-' in l:
-            return -(ord(l[1:]) - 256)
+            return -(ord(l[1:]) - 255)
         else:
-            return ord(l) - 256
+            return ord(l) - 255
     
     def clausula_numero(C):
         return [lit_numero(l) for l in C]
@@ -18,7 +18,7 @@ def SATsolver(A):
         return [clausula_numero(C) for C in S]
 
     def obtener_int(mod):
-        return {chr(256 + abs(n)):n>0 for n in mod}
+        return {chr(255 + abs(n)):n>0 for n in mod}
     
     def obtener_numeros(S):
         lista_plana = [abs(x) for sublist in S for x in sublist]
