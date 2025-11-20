@@ -92,7 +92,7 @@ class Formula :
             elif self.conectivo == '=':
                 return 5, 'alfa'
 
-    def SATtableaux(self):
+    def SATtableauxProfundidad(self):
         estado = nodos_tableaux([self])
         res = estado.es_hoja()
         if res == 'cerrada':
@@ -104,13 +104,53 @@ class Formula :
             estado = frontera.pop()
             hijos = estado.expandir()
             for a in hijos:
-                if a != None:
+                if a is not None:
                     res = a.es_hoja()
                     if res == 'abierta':
                         return a.interp()
-                    elif res == None:
+                    elif res is None:
                         frontera.append(a)
         return None
+    
+    def SATtableauxAnchura(self):
+        estado = nodos_tableaux([self])
+        res = estado.es_hoja()
+        if res == 'cerrada':
+            return None
+        elif res == 'abierta':
+            return estado.interp()
+        frontera = [estado]
+        while len(frontera) > 0:
+            estado = frontera.pop(0) 
+            hijos = estado.expandir()
+            for a in hijos:
+                if a is not None:
+                    res = a.es_hoja()
+                    if res == 'abierta':
+                        return a.interp()
+                    elif res is None:
+                        frontera.append(a)
+        return None
+    
+    def SATtableauxBacktracking(self):
+        """Versión backtracking recursivo para tableaux"""
+        def backtrack(estado):
+            res = estado.es_hoja()
+            if res == 'cerrada':
+                return None
+            elif res == 'abierta':
+                return estado.interp()
+            
+            hijos = estado.expandir()
+            for hijo in hijos:
+                if hijo is not None:
+                    resultado = backtrack(hijo)
+                    if resultado is not None:
+                        return resultado
+            return None
+    
+        estado_inicial = nodos_tableaux([self])
+        return backtrack(estado_inicial)
 
     def ver(self, D):
         '''

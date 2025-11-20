@@ -1,6 +1,4 @@
 from random import choice
-from Archivos.Proyecto import Fichas
-p = Fichas()
 
 def complemento(l):
     if '-' in l:
@@ -81,20 +79,26 @@ def dpll(S, I):
         Ipp = extender_I(I, complemento(l))
         return dpll(Spp,Ipp)
     
-def filtrar_interpretacion(I, descriptor = p.FichaEn):
+def filtrar_interpretacion(I, descriptor=None):
     """
     Filtra una interpretación I para conservar solo las letras
     que fueron creadas por el descriptor dado.
-    Válida para descriptores con cualquier número de argumentos.
+    Si `descriptor` es None, se usa la convención por defecto
+    de este proyecto (letras con código >= 256).
     """
-    # Generar todas las combinaciones posibles de argumentos
+    if descriptor is None:
+        try:
+            from Archivos.Proyecto import Fichas
+            descriptor = Fichas().FichaEn
+        except Exception:
+            return {l: v for l, v in I.items() if ord(l) >= 256}
+
     from itertools import product
     rangos = [range(n) for n in descriptor.args_lista]
-    
-    # Generar todas las letras válidas posibles
+
     letras_validas = [
         descriptor.ravel(list(combinacion))
         for combinacion in product(*rangos)
     ]
-    
+
     return {l: v for l, v in I.items() if l in letras_validas}
