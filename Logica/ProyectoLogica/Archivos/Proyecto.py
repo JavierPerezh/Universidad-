@@ -1,6 +1,5 @@
 from itertools import combinations
 from Archivos.Logica import *
-from Archivos.tsitin import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
@@ -156,6 +155,3 @@ class Fichas:
         axes.set_ylim(0, self.Ny)
         axes.set_aspect('equal')
         plt.show()
-
-from Archivos.dpll import * 
-from Archivos.walkSAT import *
