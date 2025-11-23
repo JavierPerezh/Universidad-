@@ -309,7 +309,7 @@ def ejecutar_todas_graficas():
     print("ANÁLISIS DE TIEMPOS DE EJECUCIÓN - ALGORITMOS SAT")
     print("=" * 60)
     
-    print("\n📊 GRÁFICAS INDIVIDUALES POR ALGORITMO - REGLAS")
+    print("\n GRÁFICAS INDIVIDUALES POR ALGORITMO - REGLAS")
     print("-" * 50)
     
     algoritmos_individuales = [
@@ -326,7 +326,7 @@ def ejecutar_todas_graficas():
         print(f"\n▶ {nombre} - Reglas Individuales")
         funcion(df_individual)
     
-    print("\n📈 GRÁFICAS INDIVIDUALES POR ALGORITMO - CONJUNCIONES")
+    print("\n GRÁFICAS INDIVIDUALES POR ALGORITMO - CONJUNCIONES")
     print("-" * 50)
     
     algoritmos_conjunciones = [
@@ -339,10 +339,10 @@ def ejecutar_todas_graficas():
     ]
     
     for nombre, funcion in algoritmos_conjunciones:
-        print(f"\n▶ {nombre} - Conjunciones")
+        print(f"\n {nombre} - Conjunciones")
         funcion(df_conjunciones)
     
-    print("\n🔍 GRÁFICAS COMPARATIVAS")
+    print("\n GRÁFICAS COMPARATIVAS")
     print("-" * 50)
     
     print("\n▶ Comparativa General - Reglas Individuales")
