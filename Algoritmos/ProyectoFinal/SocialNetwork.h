@@ -132,7 +132,7 @@ public:
         if (!users.count(id))
             return;
 
-        // Eliminar todas las conexiones del usuario
+        // Eliminar todas las conexiones del usuario usando búsqueda binaria
         for (int other : adj[id])
         {
             removeEdge(other, id);
@@ -157,38 +157,48 @@ public:
         auto &Uf = adj[u];
         auto &Vf = adj[v];
 
-        // Verificar si la conexión ya existe
-        if (find(Uf.begin(), Uf.end(), v) != Uf.end())
+        // Usar búsqueda binaria para verificar si la conexión ya existe
+        if (binary_search(Uf.begin(), Uf.end(), v))
             return;
 
-        // Insertar manteniendo la lista ordenada (para intersección eficiente después)
-        Uf.insert(lower_bound(Uf.begin(), Uf.end(), v), v);
-        Vf.insert(lower_bound(Vf.begin(), Vf.end(), u), u);
+        // Insertar manteniendo la lista ordenada 
+        auto it_u = lower_bound(Uf.begin(), Uf.end(), v);
+        Uf.insert(it_u, v);
+        
+        auto it_v = lower_bound(Vf.begin(), Vf.end(), u);
+        Vf.insert(it_v, u);
     }
 
-    // Eliminar conexion (arista)
+    // Eliminar conexion 
     void removeEdge(int u, int v)
     {
+        // Verificar si existen las listas de adyacencia
+        if (!adj.count(u) || !adj.count(v))
+            return;
+
         auto &Uf = adj[u];
         auto &Vf = adj[v];
 
-        // Eliminar v de la lista de adyacencia de u
-        Uf.erase(remove(Uf.begin(), Uf.end(), v), Uf.end());
-        // Eliminar u de la lista de adyacencia de v
-        Vf.erase(remove(Vf.begin(), Vf.end(), u), Vf.end());
+        auto it_u = lower_bound(Uf.begin(), Uf.end(), v);
+        if (it_u != Uf.end() && *it_u == v)
+            Uf.erase(it_u);
+
+        auto it_v = lower_bound(Vf.begin(), Vf.end(), u);
+        if (it_v != Vf.end() && *it_v == u)
+            Vf.erase(it_v);
     }
 
-    // FUNCIONES DE BÚSQUEDA Y CONEXIONES
-
-    // Verificar si dos usuarios estan conectados
+    // Verificar si dos usuarios estan conectados 
     bool areConnected(int u, int v) const
     {
         // Verificar si u existe en el grafo
         if (!adj.count(u))
             return false;
-        // Buscar v en la lista de adyacencia de u
-        return find(adj.at(u).begin(), adj.at(u).end(), v) != adj.at(u).end();
+        // Usar búsqueda binaria en la lista ordenada de adyacencia
+        return binary_search(adj.at(u).begin(), adj.at(u).end(), v);
     }
+
+    // FUNCIONES DE BÚSQUEDA Y CONEXIONES
 
     // Recorrido BFS para encontrar todos los usuarios conectados a un usuario dado
     vector<User*> BFS(int start)
@@ -256,15 +266,15 @@ public:
         return res;
     }
 
-    // FUNCIONES AVANZADAS CON OBJETOS USER COMPLETOS
+    // FUNCIONES AVANZADAS CON OBJETOS USER COMPLETOS 
 
-    // Obtener usuario por ID
+    // Obtener usuario por ID (MUY EFICIENTE - O(1))
     User* getUser(int id) const {
         auto it = users.find(id);
         return (it != users.end()) ? it->second : nullptr;
     }
 
-    // Encontrar el camino mas corto entre dos usuarios usando BFS
+    // Encontrar el camino mas corto entre dos usuarios usando BFS 
     vector<User*> shortestPath(int start, int target) const
     {
         // Verificar que ambos usuarios existan
@@ -320,7 +330,7 @@ public:
         return pathUsers;
     }
 
-    // Encontrar amigos mutuos entre dos usuarios
+    // Encontrar amigos mutuos entre dos usuarios 
     vector<User*> mutualFriends(int a, int b) const
     {
         vector<User*> res;
@@ -345,7 +355,7 @@ public:
         return res;
     }
 
-    // Filtrar usuarios por ciudad (devuelve Users completos)
+    // Filtrar usuarios por ciudad 
     vector<User*> filterByCity(const string &city) const
     {
         vector<User*> result;
@@ -359,7 +369,7 @@ public:
         return result;
     }
 
-    // Filtrar usuarios por trabajo
+    // Filtrar usuarios por trabajo 
     vector<User*> filterByJob(const string &job) const
     {
         vector<User*> result;
@@ -373,7 +383,7 @@ public:
         return result;
     }
 
-    // Ordenar usuarios por grado devuelve pares 
+    // Ordenar usuarios por grado (numero de conexiones) devuelve pares (User, grado)
     vector<pair<User*, int>> sortByDegree(bool desc) const
     {
         vector<pair<int, int>> degrees;
@@ -382,7 +392,7 @@ public:
         for (auto &p : adj)
             degrees.push_back({p.first, (int)p.second.size()});
 
-        // Ordenar por grado (ascendente o descendente)
+        // Ordenar por grado 
         sort(degrees.begin(), degrees.end(),
              [&](auto &a, auto &b)
              {
@@ -396,7 +406,7 @@ public:
         return res;
     }
 
-    // Recomendar amigos basado en amigos en común
+    // Recomendar amigos basado en amigos en común 
     vector<User*> recommendFriends(int userId) const
     {
         unordered_map<int, int> commonFriendsCount;
@@ -435,9 +445,9 @@ public:
         return result;
     }
 
-    // FUNCIONES DE UTILIDAD
+    // ========== FUNCIONES DE UTILIDAD ==========
 
-    // Obtener todos los usuarios
+    // Obtener todos los usuarios 
     vector<User*> getAllUsers() const {
         vector<User*> allUsers;
         for (auto& pair : users) {
@@ -446,7 +456,7 @@ public:
         return allUsers;
     }
 
-    // Obtener conexiones de un usuario
+    // Obtener conexiones de un usuario 
     vector<User*> getUserConnections(int userId) const {
         vector<User*> connections;
         if (!adj.count(userId)) return connections;
@@ -455,5 +465,21 @@ public:
             connections.push_back(users.at(friendId));
         }
         return connections;
+    }
+
+    // Búsqueda eficiente de usuario por nombre 
+    vector<User*> searchUsersByName(const string& name) const {
+        vector<User*> result;
+        for (auto& pair : users) {
+            if (pair.second->name.find(name) != string::npos) {
+                result.push_back(pair.second);
+            }
+        }
+        return result;
+    }
+
+    // Verificar si existe conexión usando búsqueda binaria 
+    bool hasConnection(int user1, int user2) const {
+        return areConnected(user1, user2);
     }
 };
