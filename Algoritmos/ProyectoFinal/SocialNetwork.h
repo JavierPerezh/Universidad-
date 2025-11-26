@@ -445,7 +445,7 @@ public:
         return result;
     }
 
-    // ========== FUNCIONES DE UTILIDAD ==========
+    // FUNCIONES DE UTILIDAD
 
     // Obtener todos los usuarios 
     vector<User*> getAllUsers() const {
@@ -476,10 +476,5 @@ public:
             }
         }
         return result;
-    }
-
-    // Verificar si existe conexión usando búsqueda binaria 
-    bool hasConnection(int user1, int user2) const {
-        return areConnected(user1, user2);
     }
 };
